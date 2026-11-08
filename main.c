@@ -25,36 +25,23 @@
 
 int main(void)
 {
-	uint32_t *ptr_RCC_CLKREG = (uint32_t*)0x40023830;
-	uint32_t *ptr_GPIO_MODREG = (uint32_t*)0x40020C00;
-	uint32_t *ptr_GPIO_ODR = (uint32_t*)0x40020C14;
+    // Register Addresses for STM32F407
+    uint32_t *pRCC_AHB1ENR = (uint32_t*)0x40023830; // Clock Enable Register
+    uint32_t *pGPIOD_MODER = (uint32_t*)0x40020C00; // Mode Register
+    uint32_t *pGPIOD_ODR   = (uint32_t*)0x40020C14; // Output Data Register
 
-	//Enable RCC CLK REG
-	*ptr_RCC_CLKREG |= 0X08;
+    // 1. Enable Clock for GPIOD (Bit 3 = 1)
+    *pRCC_AHB1ENR |= 0x08;
 
-	//CONFIGURE THE MODE OF I/O PIN
+    // 2. Clear MODER bits for PD12, PD13, PD14, PD15
+    *pGPIOD_MODER &= 0x00FFFFFF;
 
-	//CLEAR THE MODE REG
-	//*ptr_GPIO_MODREG &= 0XFCFFFFFF;
+    // 3. Set PD12-PD15 as Output (01 = 0x55 in top byte)
+    *pGPIOD_MODER |= 0x55000000;
 
-	//FOR FOUR LED'S
-	*ptr_GPIO_MODREG &= 0X00FFFFFF;
+    // 4. Turn ON all 4 LEDs (PD12-PD15 = 1)
+    *pGPIOD_ODR |= 0xF000;
 
-
-	//SET THE MODE REG
-	//*ptr_GPIO_MODREG |= 0X01000000;
-
-	//FOR FOUR LED'S
-	*ptr_GPIO_MODREG |= 0X55000000;
-
-	//TO BLINK AN LED SET 12th BIT OF THE ODR TO MAKE 12th PIN AS HIGH
-
-	//GREEN LED
-	//*ptr_GPIO_ODR |= 0X1000;
-
-	//TO STAY ON FOUR LED'S
-	*ptr_GPIO_ODR |= 0XF000;
-
-    /* Loop forever */
-	for(;;);
+    // Loop forever
+    for(;;);
 }
